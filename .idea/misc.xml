@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="torch" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote /home/zjx/software/anaconda3/envs/torch (sftp://zjx@202.115.73.50:10008null)" project-jdk-type="Python SDK" />
+</project>
