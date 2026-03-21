@@ -7,11 +7,11 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt  # 【新增】导入画图库
 
 # 假设这些是你项目中的模块
-from dgj.src.data_preprocessing import load_and_process_data
-from dgj.src.data_preprocessing_2 import load_and_process_data_2
-from dgj.src.module import PIDL_Model
-from dgj.src.physics_loss import calculate_physics_loss
-from dgj.src.metrics import calculate_metrics_numpy
+from src.data_preprocessing import load_and_process_data
+from src.data_preprocessing_2 import load_and_process_data_2
+from src.module import PIDL_Model
+from src.physics_loss import calculate_physics_loss
+from src.metrics import calculate_metrics_numpy
 
 
 # ... (calculate_test_loss 函数保持不变) ...
