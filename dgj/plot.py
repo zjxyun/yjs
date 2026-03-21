@@ -7,11 +7,11 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt  # 【新增】导入画图库
 
 # 假设这些是你项目中的模块
-from data_preprocessing import load_and_process_data
-from data_preprocessing_2 import load_and_process_data_2
-from dgj.module import PIDL_Model
-from physics_loss import calculate_physics_loss
-from metrics import calculate_metrics_numpy
+from dgj.src.data_preprocessing import load_and_process_data
+from dgj.src.data_preprocessing_2 import load_and_process_data_2
+from dgj.src.module import PIDL_Model
+from dgj.src.physics_loss import calculate_physics_loss
+from dgj.src.metrics import calculate_metrics_numpy
 
 
 # ... (calculate_test_loss 函数保持不变) ...
@@ -106,8 +106,8 @@ def plot_results(history, model, test_loader_sorted, device, scaler_y):
 
 def train_pidl():
     print(f"{'=' * 20} 正在加载数据 {'=' * 20}")
-    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('train_dataset.csv')
-    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('test_dataset.csv')
+    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('data/train_dataset.csv')
+    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('data/test_dataset.csv')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"🚀 运行设备: {device}")
@@ -197,7 +197,7 @@ def train_pidl():
             if val_rmse < best_val_rmse:
                 best_val_rmse = val_rmse
                 best_epoch = epoch
-                torch.save(model.state_dict(), './best_model.pth')
+                torch.save(model.state_dict(), './models/best_model.pth')
                 save_tag = "🌟 [New Best]"
 
             # 5. 构建美观的日志字符串 (使用 f-string 表格对齐)
@@ -228,7 +228,7 @@ def train_pidl():
     # 训练结束
     print(f"\n{'=' * 20} 训练结束, Best Epoch:{best_epoch}, RMSE:{best_val_rmse:.4f} {'=' * 20}")
 
-    model.load_state_dict(torch.load('./best_model.pth'))
+    model.load_state_dict(torch.load('./models/best_model.pth'))
     plot_results(history, model, test_loader_sorted, device, scaler_y_test)
 
     return model

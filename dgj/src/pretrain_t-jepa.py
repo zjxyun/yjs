@@ -9,7 +9,7 @@ from tqdm import tqdm
 # 【修改 1】导入 MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler
 
-from dgj.TJEPA.tjepa_model import TJEPA
+from dgj.src.tjepa import TJEPA
 
 
 # -----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ def pretrain():
     # 建议：强制重新生成一次，确保数据是最新的
     print("Generating/Refreshing pre-training dataset...")
     from data_preprocessing_tjepa_56 import preprocess_shield_data
-    preprocess_shield_data('train_dataset.csv', 'train_pretrain.csv')
+    preprocess_shield_data('data/train_dataset.csv', 'train_pretrain.csv')
 
     # B. 加载宽表数据
     X_train, num_features = load_pretrain_data('train_pretrain.csv')

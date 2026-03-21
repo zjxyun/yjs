@@ -6,8 +6,8 @@ import os
 # 配置部分
 # =============================================================================
 # 原始数据文件路径
-RAW_DATA_PATH = '/home/zjx/dgj/train_dataset.csv'  # 请修改为你的原始大宽表路径
-OUTPUT_PATH = 'train_pretrain.csv'
+RAW_DATA_PATH = '/dgj/data/train_dataset.csv'  # 请修改为你的原始大宽表路径
+OUTPUT_PATH = '../data/train_pretrain.csv'
 
 # 需要强制转换为数值的列（从你的参数.txt中提取的核心参数）
 # 这些列如果包含乱码或空值，会被强制转为 NaN 并填充 0

@@ -10,7 +10,7 @@ import joblib
 from dgj.data_preprocessing import load_and_process_data
 from dgj.data_preprocessing_2 import load_and_process_data_2
 # 【重点】导入集成了 T-JEPA 和 KAN 的模型
-from module_tjepa import TJEPA_KAN_PIDL
+from dgj.src.module_tjepa import TJEPA_KAN_PIDL
 from dgj.physics_loss import calculate_physics_loss
 from dgj.metrics import calculate_metrics_numpy
 
@@ -108,10 +108,10 @@ def plot_results(history, model, test_loader_sorted, device, scaler_y):
 # ------------------------------------------------------------------------------
 def train_tjepa_kan():
     print(f"{'=' * 20} Loading Data {'=' * 20}")
-    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('dgj/train_dataset.csv')
-    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('/home/zjx/dgj/test_dataset.csv')
+    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('/dgj/data/train_dataset.csv')
+    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('/dgj/data/test_dataset.csv')
     # 替换掉函数生成的 scaler
-    scaler_x_train = joblib.load('scaler_tjepa.joblib')
+    scaler_x_train = joblib.load('models/scaler_tjepa.joblib')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"🚀 Device: {device}")
@@ -211,7 +211,7 @@ def train_tjepa_kan():
             if val_rmse < best_val_rmse:
                 best_val_rmse = val_rmse
                 best_epoch = epoch
-                torch.save(model.state_dict(), './best_tjepa_kan.pth')
+                torch.save(model.state_dict(), 'models/best_tjepa_kan.pth')
                 save_tag = "🌟"
 
             msgs = []
@@ -226,7 +226,7 @@ def train_tjepa_kan():
     print(f"Training Finished. Best Epoch: {best_epoch}, Best RMSE: {best_val_rmse:.4f}")
 
     # 绘图
-    model.load_state_dict(torch.load('./best_tjepa_kan.pth'))
+    model.load_state_dict(torch.load('models/best_tjepa_kan.pth'))
     plot_results(history, model, test_loader_sorted, device, scaler_y_test)
 
 

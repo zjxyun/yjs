@@ -3,14 +3,13 @@
 import pandas as pd
 import numpy as np
 import torch
-import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 from tqdm import tqdm
 from sklearn.preprocessing import MinMaxScaler
 import joblib  # 【新增】用于保存 scaler
 import os
 
-from tjepa_model import TJEPA
+from dgj.src.tjepa import TJEPA
 
 # =============================================================================
 # 配置
@@ -19,8 +18,8 @@ BATCH_SIZE = 256
 LEARNING_RATE = 1e-3
 EPOCHS = 100 # 建议 200-500
 MASK_RATIO = 0.3  # 遮挡 30% 让模型去猜
-SCALER_PATH = 'scaler_tjepa.joblib'  # Scaler 保存路径
-BEST_MODEL_PATH = 'tjepa_pretrained_best.pth'
+SCALER_PATH = '../models/scaler_tjepa.joblib'  # Scaler 保存路径
+BEST_MODEL_PATH = '../models/tjepa_pretrained_best.pth'
 
 
 
@@ -70,15 +69,15 @@ def pretrain():
 
     # 确保预处理脚本是最新的
     # 假设你使用的是 56 特征版本，如果是 9 特征版本请修改 import
-    from data_preprocessing_tjepa_9 import preprocess_shield_data
+    from dgj.src.data_preprocessing_tjepa_9 import preprocess_shield_data
 
-    if not os.path.exists('train_pretrain.csv'):
+    if not os.path.exists('../data/train_pretrain.csv'):
         print("Generating pre-training dataset...")
-        preprocess_shield_data('train_dataset.csv', 'train_pretrain.csv')
+        preprocess_shield_data('train_dataset.csv', '../data/train_pretrain.csv')
     else:
         print("Using existing train_pretrain.csv")
 
-    X_train, num_features = load_pretrain_data('train_pretrain.csv')
+    X_train, num_features = load_pretrain_data('../data/train_pretrain.csv')
 
     dataset = TensorDataset(X_train)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)

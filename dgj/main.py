@@ -95,8 +95,8 @@ def train_pidl():
     # ==========================================
     print(f"{'=' * 20} 正在加载数据 {'=' * 20}")
     # 注意：通常训练集和测试集应该来自不同的切分，这里假设你已经处理好或者为了演示读了同一个
-    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('train_dataset.csv')
-    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('test_dataset.csv')  # 这里建议换成 test_dataset.csv
+    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('data/train_dataset.csv')
+    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('data/test_dataset.csv')  # 这里建议换成 test_dataset.csv
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"🚀 运行设备: {device}")

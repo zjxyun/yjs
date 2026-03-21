@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import os
 
 # 复用现有的模块
-from data_preprocessing import load_and_process_data
-from data_preprocessing_2 import load_and_process_data_2
-from metrics import calculate_metrics_numpy
+from dgj.src.data_preprocessing import load_and_process_data
+from dgj.src.data_preprocessing_2 import load_and_process_data_2
+from dgj.src.metrics import calculate_metrics_numpy
 
 
 # ==========================================
@@ -68,8 +68,8 @@ def train_pure_dnn():
     print(f"{'=' * 20} 启动纯 DNN 对比实验 {'=' * 20}")
 
     # 1. 加载数据
-    X_train, Y_train, P_train, scaler_x, scaler_y = load_and_process_data('train_dataset.csv')
-    X_test, Y_test, P_test, _, _ = load_and_process_data_2('test_dataset.csv')
+    X_train, Y_train, P_train, scaler_x, scaler_y = load_and_process_data('data/train_dataset.csv')
+    X_test, Y_test, P_test, _, _ = load_and_process_data_2('data/test_dataset.csv')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     BATCH_SIZE = 64
@@ -141,7 +141,7 @@ def train_pure_dnn():
     # 4. 最终评估与画图
     print(f"\n{'=' * 20} 训练结束. Best RMSE: {best_rmse:.4f} {'=' * 20}")
 
-    model.load_state_dict(torch.load('best_dnn_model.pth'))
+    model.load_state_dict(torch.load('./models/best_dnn_model.pth'))
     metrics, targets, preds = evaluate_model(model, test_loader, device, scaler_y)
 
     # 打印最终表格

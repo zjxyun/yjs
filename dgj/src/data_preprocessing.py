@@ -306,6 +306,6 @@ def load_and_process_data(file_path):
 if __name__ == "__main__":
     # 确保文件名和路径正确
     try:
-        X_data, Y_data,Phys_data, scaler_x, scaler_y = load_and_process_data('train_dataset.csv')
+        X_data, Y_data,Phys_data, scaler_x, scaler_y = load_and_process_data('data/train_dataset.csv')
     except Exception as e:
         print(f"运行出错: {e}")

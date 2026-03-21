@@ -6,7 +6,7 @@ import os
 # 配置部分
 # =============================================================================
 # 原始数据文件路径
-RAW_DATA_PATH = 'train_dataset.csv'  # 请修改为你的原始大宽表路径
+RAW_DATA_PATH = 'data/train_dataset.csv'  # 请修改为你的原始大宽表路径
 OUTPUT_PATH = 'train_pretrain.csv'
 
 # 需要强制转换为数值的列（从你的参数.txt中提取的核心参数）
