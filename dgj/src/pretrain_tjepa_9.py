@@ -73,11 +73,11 @@ def pretrain():
 
     if not os.path.exists('data/train_pretrain.csv'):
         print("Generating pre-training dataset...")
-        preprocess_shield_data('train_dataset.csv', '../data/train_pretrain.csv')
+        preprocess_shield_data('train_dataset.csv', 'data/train_pretrain.csv')
     else:
         print("Using existing train_pretrain.csv")
 
-    X_train, num_features = load_pretrain_data('../data/train_pretrain.csv')
+    X_train, num_features = load_pretrain_data('data/train_pretrain.csv')
 
     dataset = TensorDataset(X_train)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
