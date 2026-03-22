@@ -6,7 +6,7 @@ from src.tjepa import TJEPA
 
 
 class TJEPA_KAN_PIDL(nn.Module):
-    def __init__(self, pretrained_path="tjepa_pretrained.pth"):
+    def __init__(self, pretrained_path="models/tjepa_pretrained.pth"):
         super().__init__()
 
         # 1. 初始化 T-JEPA (使用下游任务的特征数量，例如 9)
