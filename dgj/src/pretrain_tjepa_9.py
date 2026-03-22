@@ -69,7 +69,7 @@ def pretrain():
 
     # 确保预处理脚本是最新的
     # 假设你使用的是 56 特征版本，如果是 9 特征版本请修改 import
-    from dgj.src.data_preprocessing_tjepa_9 import preprocess_shield_data
+    from src.data_preprocessing_tjepa_9 import preprocess_shield_data
 
     if not os.path.exists('data/train_pretrain.csv'):
         print("Generating pre-training dataset...")
