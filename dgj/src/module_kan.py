@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 # 【新增】引入 KAN
-from efficient_kan import KAN
+from src.efficient_kan import KAN
 
 
 class PIDL_Model(nn.Module):
