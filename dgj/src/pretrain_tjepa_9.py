@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 import joblib  # 【新增】用于保存 scaler
 import os
 
-from tjepa import TJEPA
+from src.tjepa import TJEPA
 
 # =============================================================================
 # 配置

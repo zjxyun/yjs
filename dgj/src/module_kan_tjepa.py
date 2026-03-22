@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from efficient_kan import KAN
-from tjepa import TJEPA
+from src.efficient_kan import KAN
+from src.tjepa import TJEPA
 
 
 class TJEPA_KAN_PIDL(nn.Module):
