@@ -108,8 +108,8 @@ def plot_results(history, model, test_loader_sorted, device, scaler_y):
 # ------------------------------------------------------------------------------
 def train_tjepa_kan():
     print(f"{'=' * 20} Loading Data {'=' * 20}")
-    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('/dgj/data/train_dataset.csv')
-    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('/dgj/data/test_dataset.csv')
+    X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('data/train_dataset.csv')
+    X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('data/test_dataset.csv')
     # 替换掉函数生成的 scaler
     scaler_x_train = joblib.load('models/scaler_tjepa.joblib')
 
