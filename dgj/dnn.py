@@ -82,8 +82,7 @@ def train_pure_dnn():
 
     # 优化器 (只优化网络权重)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50,
-                                                           verbose=False)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50)
     loss_fn = nn.MSELoss()
 
     epochs = 2000
