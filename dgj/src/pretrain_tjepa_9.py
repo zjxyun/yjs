@@ -18,8 +18,8 @@ BATCH_SIZE = 256
 LEARNING_RATE = 1e-3
 EPOCHS = 100 # 建议 200-500
 MASK_RATIO = 0.3  # 遮挡 30% 让模型去猜
-SCALER_PATH = '../models/scaler_tjepa.joblib'  # Scaler 保存路径
-BEST_MODEL_PATH = '../models/tjepa_pretrained_best.pth'
+SCALER_PATH = 'models/scaler_tjepa.joblib'  # Scaler 保存路径
+BEST_MODEL_PATH = 'models/tjepa_pretrained_best.pth'
 
 
 
