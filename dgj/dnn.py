@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import os
 
 # 复用现有的模块
-from dgj.src.data_preprocessing import load_and_process_data
-from dgj.src.data_preprocessing_2 import load_and_process_data_2
-from dgj.src.metrics import calculate_metrics_numpy
+from src.data_preprocessing import load_and_process_data
+from src.data_preprocessing_2 import load_and_process_data_2
+from src.metrics import calculate_metrics_numpy
 
 
 # ==========================================

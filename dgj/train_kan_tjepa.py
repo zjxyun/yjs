@@ -7,12 +7,12 @@ import matplotlib.pyplot as plt
 import joblib
 
 # 导入数据处理
-from dgj.data_preprocessing import load_and_process_data
-from dgj.data_preprocessing_2 import load_and_process_data_2
+from src.data_preprocessing import load_and_process_data
+from src.data_preprocessing_2 import load_and_process_data_2
 # 【重点】导入集成了 T-JEPA 和 KAN 的模型
-from dgj.src.module_tjepa import TJEPA_KAN_PIDL
-from dgj.physics_loss import calculate_physics_loss
-from dgj.metrics import calculate_metrics_numpy
+from src.module_tjepa import TJEPA_KAN_PIDL
+from src.physics_loss import calculate_physics_loss
+from src.metrics import calculate_metrics_numpy
 
 
 # ------------------------------------------------------------------------------

@@ -5,12 +5,12 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from module_kan import PIDL_Model
+from src.module_kan import PIDL_Model
 
-from data_preprocessing import load_and_process_data
-from data_preprocessing_2 import load_and_process_data_2
-from physics_loss import calculate_physics_loss
-from metrics import calculate_metrics_numpy
+from src.data_preprocessing import load_and_process_data
+from src.data_preprocessing_2 import load_and_process_data_2
+from src.physics_loss import calculate_physics_loss
+from src.metrics import calculate_metrics_numpy
 
 
 # ------------------------------------------------------------------------------
