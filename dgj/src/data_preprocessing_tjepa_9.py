@@ -6,8 +6,8 @@ import os
 # 配置部分
 # =============================================================================
 # 原始数据文件路径
-RAW_DATA_PATH = '/dgj/data/train_dataset.csv'  # 请修改为你的原始大宽表路径
-OUTPUT_PATH = '../data/train_pretrain.csv'
+RAW_DATA_PATH = 'data/train_dataset.csv'  # 请修改为你的原始大宽表路径
+OUTPUT_PATH = 'data/train_pretrain_v>0.csv'
 
 # 需要强制转换为数值的列（从你的参数.txt中提取的核心参数）
 # 这些列如果包含乱码或空值，会被强制转为 NaN 并填充 0
@@ -58,13 +58,13 @@ def preprocess_shield_data(file_path, output_path):
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
     # 删除推进速度为空或为0的行 (非掘进状态)
-    # if SPEED_COL in df.columns:
-    #     original_len = len(df)
-    #     df.dropna(subset=[SPEED_COL], inplace=True)
-    #     df = df[df[SPEED_COL] > 0.5]  # 阈值设为0.5，过滤极其微小的蠕动
-    #     print(f"过滤非掘进状态后: {original_len} -> {len(df)}")
-    # else:
-    #     print(f" 警告：未找到 '{SPEED_COL}' 列，无法过滤非掘进状态")
+    if SPEED_COL in df.columns:
+        original_len = len(df)
+        df.dropna(subset=[SPEED_COL], inplace=True)
+        df = df[df[SPEED_COL] > 0.5]  # 阈值设为0.5，过滤极其微小的蠕动
+        print(f"过滤非掘进状态后: {original_len} -> {len(df)}")
+    else:
+        print(f" 警告：未找到 '{SPEED_COL}' 列，无法过滤非掘进状态")
 
     # 3. 处理时间戳 (用于切分片段)
     if '时间' in df.columns:
