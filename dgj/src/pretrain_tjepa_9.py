@@ -71,13 +71,13 @@ def pretrain():
     # 假设你使用的是 56 特征版本，如果是 9 特征版本请修改 import
     from src.data_preprocessing_tjepa_9 import preprocess_shield_data
 
-    if not os.path.exists('data/train_pretrain.csv'):
-        print("Generating pre-training dataset...")
-        preprocess_shield_data('train_dataset.csv', 'data/train_pretrain.csv')
-    else:
-        print("Using existing train_pretrain.csv")
+    # if not os.path.exists('data/train_pretrain.csv'):
+    #     print("Generating pre-training dataset...")
+    #     preprocess_shield_data('train_dataset.csv', 'data/train_pretrain.csv')
+    # else:
+    #     print("Using existing train_pretrain.csv")
 
-    X_train, num_features = load_pretrain_data('data/train_pretrain.csv')
+    X_train, num_features = load_pretrain_data('data/train_pretrain_vda.csv')
 
     dataset = TensorDataset(X_train)
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
