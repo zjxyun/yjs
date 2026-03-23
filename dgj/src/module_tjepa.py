@@ -113,9 +113,14 @@ class TJEPA_KAN_PIDL(nn.Module):
         real_K = F.softplus(self.K_coeff) * self.K_scale
         return real_B, real_K
 
+    # def get_net_parameters(self):
+    #     # 返回 KAN 的参数 (T-JEPA已冻结)
+    #     return self.kan.parameters()
+
     def get_net_parameters(self):
-        # 返回 KAN 的参数 (T-JEPA已冻结)
-        return self.kan.parameters()
+        # 将 KAN 和 T-JEPA 的参数打包返回
+        import itertools
+        return itertools.chain(self.kan.parameters(), self.tjepa.parameters())
 
     def get_phy_parameters(self):
         return [self.B_coeff, self.K_coeff]
