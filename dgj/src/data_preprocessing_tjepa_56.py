@@ -7,7 +7,7 @@ import os
 # =============================================================================
 # 原始数据文件路径
 RAW_DATA_PATH = 'data/train_dataset.csv'  # 请修改为你的原始大宽表路径
-OUTPUT_PATH = 'train_pretrain.csv'
+OUTPUT_PATH = 'data/train_pretrain_56.csv'
 
 # 需要强制转换为数值的列（从你的参数.txt中提取的核心参数）
 # 这些列如果包含乱码或空值，会被强制转为 NaN 并填充 0
@@ -34,7 +34,7 @@ SPEED_COL = '推进速度'
 
 
 def preprocess_shield_data(file_path, output_path):
-    print(f"🚀 开始处理数据: {file_path}")
+    print(f" 开始处理数据: {file_path}")
 
     # 1. 读取数据
     try:
@@ -43,7 +43,7 @@ def preprocess_shield_data(file_path, output_path):
         try:
             df = pd.read_csv(file_path, encoding='gbk')
         except:
-            print("❌ 读取失败，请检查文件编码")
+            print("读取失败，请检查文件编码")
             return
 
     print(f"原始数据形状: {df.shape}")
@@ -58,13 +58,13 @@ def preprocess_shield_data(file_path, output_path):
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
     # 删除推进速度为空或为0的行 (非掘进状态)
-    # if SPEED_COL in df.columns:
-    #     original_len = len(df)
-    #     df.dropna(subset=[SPEED_COL], inplace=True)
-    #     df = df[df[SPEED_COL] > 0.5]  # 阈值设为0.5，过滤极其微小的蠕动
-    #     print(f"过滤非掘进状态后: {original_len} -> {len(df)}")
-    # else:
-    #     print(f"⚠️ 警告：未找到 '{SPEED_COL}' 列，无法过滤非掘进状态")
+    if SPEED_COL in df.columns:
+        original_len = len(df)
+        df.dropna(subset=[SPEED_COL], inplace=True)
+        df = df[df[SPEED_COL] > 0.5]  # 阈值设为0.5，过滤极其微小的蠕动
+        print(f"过滤非掘进状态后: {original_len} -> {len(df)}")
+    else:
+        print(f" 警告：未找到 '{SPEED_COL}' 列，无法过滤非掘进状态")
 
     # 3. 处理时间戳 (用于切分片段)
     if '时间' in df.columns:
@@ -96,17 +96,24 @@ def preprocess_shield_data(file_path, output_path):
     # 所以：保留所有数值型列，排除 ID、时间字符串等
 
     # 自动选择数值列
-    numeric_df = df.select_dtypes(include=[np.number])
+    # numeric_df = df.select_dtypes(include=[np.number])
+    #
+    # # 排除不必要的列
+    # drop_cols = ['segment_id', '环数', 'Column1']  # 't_sec' 可以保留，作为时间特征
+    # final_cols = [c for c in numeric_df.columns if c not in drop_cols]
+    #
+    # final_cols = sorted(final_cols)  # 排序保证顺序固定
+    # # 填充剩余的 NaN (用 0 填充，或者用前向填充)
+    # df_final = numeric_df[final_cols].copy()
+    # df_final.dropna(inplace=True)
 
-    # 排除不必要的列
-    drop_cols = ['segment_id', '环数', 'Column1']  # 't_sec' 可以保留，作为时间特征
-    final_cols = [c for c in numeric_df.columns if c not in drop_cols]
-
-    final_cols = sorted(final_cols)  # 排序保证顺序固定
-    # 填充剩余的 NaN (用 0 填充，或者用前向填充)
-    df_final = numeric_df[final_cols].copy()
-    df_final.dropna(inplace=True)
-
+    # # 定义需要构建历史特征的列
+    # target_cols = ['C组推进位移行程', 'E组推进位移行程']  # y_lower, y_upper
+    #
+    # # 1. 构建 y(t-1) 和 y(t-2)
+    # for col in target_cols:
+    #     df[f'{col}_t-1'] = df[col].shift(1)
+    #
     # # x1~x5: 地层负载/反力
     # df['x1_load'] = df['2#土压传感器压力']
     # df['x2_load'] = df['3#土压传感器压力']
@@ -120,36 +127,46 @@ def preprocess_shield_data(file_path, output_path):
     #
     # df['y_lower'] = df['C组推进位移行程']
     # df['y_upper'] = df['E组推进位移行程']
+    # df['y_lower_t-1'] = df['C组推进位移行程_t-1']
+    # df['y_upper_t-1'] = df['E组推进位移行程_t-1']
     #
     # used_cols = [
     #     't_sec',
     #     'x1_load', 'x2_load', 'x3_load', 'x4_load', 'x5_load',
     #     'x6_diff',  'y_lower', 'y_upper'
     # ]
-    # df_final = df[used_cols].copy()
-    #
-    # df_final.dropna(inplace=True)
+
+    # 组合目标列
+    target_cols = ['t_sec'] + NUMERIC_COLS
+
+    # 只提取 df 中确实存在的列（过滤掉不存在的列）
+    existing_cols = [col for col in target_cols if col in df.columns]
+
+    # 生成新表
+    df_final = df[existing_cols].copy()
+    df_final.dropna(inplace=True)
+
 
     print(f"✅ 最终特征数量: {df_final.shape[1]}")
     print(f"特征列表 : {df_final.columns[:10].tolist()}")
 
-    # 记录 9 个核心特征的索引
-    physics_9_names = [
-        '2#土压传感器压力', '3#土压传感器压力', '4#土压传感器压力', '5#土压传感器压力', '6#土压传感器压力',
-        'C组推进压力', 'E组推进压力', 'C组推进位移行程', 'E组推进位移行程'
-    ]
-    # 获取这 9 个特征在 df_final 中的位置
-    physics_idx = [df_final.columns.get_loc(c) for c in physics_9_names if c in df_final.columns]
-
-    # 保存列名列表，这是预训练和下游任务对接的唯一凭证
-    with open("feature_list.txt", "w", encoding="utf-8") as f:
-        f.write("\n".join(df_final.columns.tolist()))
-
-    print(f"核心 9 特征索引已确认: {physics_idx}")
+    # # 记录 9 个核心特征的索引
+    # physics_9_names = [
+    #     '2#土压传感器压力', '3#土压传感器压力', '4#土压传感器压力', '5#土压传感器压力', '6#土压传感器压力',
+    #     'C组推进压力', 'E组推进压力', 'C组推进位移行程', 'E组推进位移行程'
+    # ]
+    # # 获取这 9 个特征在 df_final 中的位置
+    # physics_idx = [df_final.columns.get_loc(c) for c in physics_9_names if c in df_final.columns]
+    #
+    # # 保存列名列表，这是预训练和下游任务对接的唯一凭证
+    # with open("feature_list.txt", "w", encoding="utf-8") as f:
+    #     f.write("\n".join(df_final.columns.tolist()))
+    #
+    # print(f"核心 9 特征索引已确认: {physics_idx}")
 
     # 6. 保存
     df_final.to_csv(output_path, index=False, encoding='utf-8')
-    print(f"💾 预处理数据已保存至: {output_path}")
+    print(f"预处理数据已保存至: {output_path}")
 
     # 返回列名，供后续检查
     return df_final.columns.tolist()
