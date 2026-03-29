@@ -39,13 +39,13 @@ class TJEPA_KAN_PIDL(nn.Module):
                 # 打印加载情况
                 loaded_keys = len(pretrained_dict)
                 total_keys = len(state_dict)
-                print(f"✅ 成功加载预训练权重: {loaded_keys}/{total_keys} 层匹配成功。")
+                print(f" 成功加载预训练权重: {loaded_keys}/{total_keys} 层匹配成功。")
                 print("   (Embedding层因维度不同被跳过是正常的，Transformer核心层已加载)")
 
             except FileNotFoundError:
-                print("⚠️ 未找到预训练权重文件，将使用随机初始化！")
+                print(" 未找到预训练权重文件，将使用随机初始化！")
             except Exception as e:
-                print(f"⚠️ 加载权重时出错: {e}，将使用随机初始化！")
+                print(f" 加载权重时出错: {e}，将使用随机初始化！")
 
         # 3. 冻结 T-JEPA (Context Encoder) 的参数
         # 建议：如果只是做迁移学习，先冻结比较好
