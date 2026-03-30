@@ -111,7 +111,7 @@ def train_tjepa_kan():
     X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('data/train_dataset.csv')
     X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('data/test_dataset.csv')
     # 替换掉函数生成的 scaler
-    scaler_x_train = joblib.load('models/scaler_tjepa_56.joblib')
+    scaler_x_train = joblib.load('models/scaler_tjepa.joblib')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"🚀 Device: {device}")
@@ -140,8 +140,7 @@ def train_tjepa_kan():
         {'params': model.get_phy_parameters(), 'lr': 0.01}  # 物理参数
     ])
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50,
-                                                           verbose=False)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=50)
     loss_mse = nn.MSELoss()
 
     epochs = 5000
