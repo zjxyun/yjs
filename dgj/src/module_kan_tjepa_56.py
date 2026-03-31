@@ -11,7 +11,7 @@ class TJEPA_KAN_PIDL(nn.Module):
 
         # 1. 初始化 T-JEPA (使用下游任务的特征数量，例如 9)
         # 注意：这里我们初始化的是“接受9个特征”的 T-JEPA
-        self.tjepa = TJEPA(num_features=9, embed_dim=128)
+        self.tjepa = TJEPA(num_features=62, embed_dim=128)
 
         # 2. 智能加载预训练权重
         if pretrained_path:
