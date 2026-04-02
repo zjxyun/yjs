@@ -156,26 +156,26 @@ def train_pure_dnn():
 
     print("-" * 65)
 
-    # # 画图对比
-    # plt.figure(figsize=(12, 5))
-    #
-    # # Loss
-    # plt.subplot(1, 2, 1)
-    # plt.plot(history_loss, label='MSE Loss')
-    # plt.title('DNN Training Loss')
-    # plt.yscale('log')
-    # plt.legend()
-    #
-    # # Pred vs True
-    # plt.subplot(1, 2, 2)
-    # limit = 300
-    # plt.plot(targets[:limit, 0], label='Truth', color='gray', alpha=0.7)
-    # plt.plot(preds[:limit, 0], label='DNN Pred', color='blue', linestyle='--')
-    # plt.title('Pure DNN Prediction (Lower Cylinder)')
-    # plt.legend()
-    #
-    # plt.tight_layout()
-    # plt.show()
+    # 画图对比
+    plt.figure(figsize=(12, 5))
+
+    # Loss
+    plt.subplot(1, 2, 1)
+    plt.plot(history_loss, label='MSE Loss')
+    plt.title('DNN Training Loss')
+    plt.yscale('log')
+    plt.legend()
+
+    # Pred vs True
+    plt.subplot(1, 2, 2)
+    limit = 300
+    plt.plot(targets[:limit, 0], label='Truth', color='gray', alpha=0.7)
+    plt.plot(preds[:limit, 0], label='DNN Pred', color='blue', linestyle='--')
+    plt.title('Pure DNN Prediction (Lower Cylinder)')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == '__main__':
