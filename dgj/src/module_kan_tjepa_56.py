@@ -48,7 +48,7 @@ class TJEPA_KAN_PIDL(nn.Module):
 
         # 冻结 T-JEPA
         for param in self.tjepa.parameters():
-            param.requires_grad = False  # 建议先冻结，跑通了再尝试微调
+            param.requires_grad = True  # 建议先冻结，跑通了再尝试微调
 
         # ==========================================
         # 2. 初始化下游网络 (KAN)
