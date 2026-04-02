@@ -92,3 +92,18 @@ class TJEPA_KAN_PIDL(nn.Module):
         y_pred = self.kan(combined_feat)
 
         return y_pred
+
+    def get_real_physics_params(self):
+        real_B = F.softplus(self.B_coeff) * self.B_scale
+        real_K = F.softplus(self.K_coeff) * self.K_scale
+        return real_B, real_K
+
+    def get_net_parameters(self):
+        # 返回 KAN 的参数 (T-JEPA已冻结)
+        return self.kan.parameters()
+
+    def get_phy_parameters(self):
+        return [self.B_coeff, self.K_coeff]
+
+    def get_kan_reg_loss(self):
+        return self.kan.regularization_loss()
