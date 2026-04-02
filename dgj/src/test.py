@@ -20,6 +20,30 @@ class TJEPA_KAN_PIDL(nn.Module):
         self.physics_idx = [0, 1, 2, 3,10, 11, 12, 13, 14]
 
         # ... (智能加载预训练权重的 try-except 代码块保持不变) ...
+        if pretrained_path:
+            try:
+                # 读取权重文件
+                checkpoint = torch.load(pretrained_path)
+                state_dict = checkpoint['state_dict'] if 'state_dict' in checkpoint else checkpoint
+
+                # 【修正 1】严格检查 Embedding 层维度
+                # 如果预训练是 50 维，这里是 9 维，必须报错，不能静默跳过
+                current_emb_shape = self.tjepa.feature_embeds[0].weight.shape
+                pretrained_emb_shape = state_dict['feature_embeds.0.weight'].shape
+
+                if current_emb_shape != pretrained_emb_shape:
+                    raise ValueError(
+                        f"❌ 特征维度不匹配！预训练模型: {pretrained_emb_shape}, 当前模型: {current_emb_shape}")
+
+                # 加载权重 (strict=False 是因为我们需要忽略 target_encoder 和 predictor)
+                self.tjepa.load_state_dict(state_dict, strict=False)
+                print(f"✅ 成功加载预训练权重: {pretrained_path}")
+
+            except FileNotFoundError:
+                print(f"⚠️ 未找到权重文件: {pretrained_path}，使用随机初始化！")
+            except Exception as e:
+                print(f"⚠️ 加载权重时出错: {e}")
+                raise e  # 建议抛出异常，不要继续训练，否则是随机初始化
         # 注意：这里加载 62 维的权重将完美匹配，不会再报错！
 
         # 冻结 T-JEPA
@@ -39,6 +63,13 @@ class TJEPA_KAN_PIDL(nn.Module):
         )
 
         # ... (物理参数 B_coeff, K_coeff 的定义保持不变) ...
+        self.B_coeff = nn.Parameter(torch.tensor([1.0, 1.0]), requires_grad=True)
+        self.K_coeff = nn.Parameter(torch.tensor([1.0, 1.0]), requires_grad=True)
+        self.register_buffer('B_scale', torch.tensor(1e7))
+        self.register_buffer('K_scale', torch.tensor(1e7))
+        self.register_buffer('mass', torch.tensor(2206.0))
+        self.register_buffer('area_up', torch.tensor(3 * 3.14159 * (0.1) ** 2))
+        self.register_buffer('area_low', torch.tensor(4 * 3.14159 * (0.1) ** 2))
 
     def forward(self, x_9d):
         """
