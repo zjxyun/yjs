@@ -111,7 +111,7 @@ def train_tjepa_kan():
     X_train, Y_train, P_train, scaler_x_train, scaler_y_train = load_and_process_data('data/train_dataset.csv')
     X_test, Y_test, P_test, scaler_x_test, scaler_y_test = load_and_process_data_2('data/test_dataset.csv')
     # 替换掉函数生成的 scaler
-    scaler_x_train = joblib.load('models/scaler_tjepa_56.joblib')
+    # scaler_x_train = joblib.load('models/scaler_tjepa_56.joblib')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"🚀 Device: {device}")
@@ -210,7 +210,7 @@ def train_tjepa_kan():
             if val_rmse < best_val_rmse:
                 best_val_rmse = val_rmse
                 best_epoch = epoch
-                torch.save(model.state_dict(), 'models/best_tjepa_kan.pth')
+                torch.save(model.state_dict(), 'models/best_tjepa_kan56.pth')
                 save_tag = "🌟"
 
             msgs = []
