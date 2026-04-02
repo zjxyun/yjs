@@ -13,7 +13,7 @@ class TJEPA_KAN_PIDL(nn.Module):
         # 1. 初始化高维的 T-JEPA (必须与预训练的维度一致)
         # 根据你之前的报错日志，预训练模型接收 62 个特征
         # ==========================================
-        self.pretrained_features = 64
+        self.pretrained_features = 65
         self.tjepa = TJEPA(num_features=self.pretrained_features, embed_dim=128)
 
         # 【需要你手动填入】：这 9 个输入特征在 62 维预训练数据中的真实列索引
