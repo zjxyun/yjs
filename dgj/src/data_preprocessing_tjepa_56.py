@@ -113,6 +113,7 @@ def preprocess_shield_data(file_path, output_path):
     # 1. 构建 y(t-1) 和 y(t-2)
     df['C组推进位移行程_t-1'] = df['C组推进位移行程'].shift(1)
     df['E组推进位移行程_t-1'] = df['E组推进位移行程'].shift(1)
+    df['diff'] = df['C组推进压力'] - df['E组推进压力']
     #
     # # x1~x5: 地层负载/反力
     # df['x1_load'] = df['2#土压传感器压力']
@@ -136,7 +137,7 @@ def preprocess_shield_data(file_path, output_path):
     # ]
 
     # 组合目标列
-    target_cols = ['t_sec'] +['C组推进位移行程_t-1'] + ['E组推进位移行程_t-1'] + NUMERIC_COLS
+    target_cols = ['t_sec'] +['C组推进位移行程_t-1'] + ['E组推进位移行程_t-1'] + ['diff'] + NUMERIC_COLS
 
     # 只提取 df 中确实存在的列（过滤掉不存在的列）
     existing_cols = [col for col in target_cols if col in df.columns]
