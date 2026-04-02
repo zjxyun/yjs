@@ -110,9 +110,9 @@ def preprocess_shield_data(file_path, output_path):
     # # 定义需要构建历史特征的列
     # target_cols = ['C组推进位移行程', 'E组推进位移行程']  # y_lower, y_upper
     #
-    # # 1. 构建 y(t-1) 和 y(t-2)
-    # for col in target_cols:
-    #     df[f'{col}_t-1'] = df[col].shift(1)
+    # 1. 构建 y(t-1) 和 y(t-2)
+    df['C组推进位移行程_t-1'] = df['C组推进位移行程'].shift(1)
+    df['E组推进位移行程_t-1'] = df['E组推进位移行程'].shift(1)
     #
     # # x1~x5: 地层负载/反力
     # df['x1_load'] = df['2#土压传感器压力']
@@ -127,8 +127,7 @@ def preprocess_shield_data(file_path, output_path):
     #
     # df['y_lower'] = df['C组推进位移行程']
     # df['y_upper'] = df['E组推进位移行程']
-    # df['y_lower_t-1'] = df['C组推进位移行程_t-1']
-    # df['y_upper_t-1'] = df['E组推进位移行程_t-1']
+
     #
     # used_cols = [
     #     't_sec',
@@ -137,7 +136,7 @@ def preprocess_shield_data(file_path, output_path):
     # ]
 
     # 组合目标列
-    target_cols = ['t_sec'] + NUMERIC_COLS
+    target_cols = ['t_sec'] +['C组推进位移行程_t-1'] + ['E组推进位移行程_t-1'] + NUMERIC_COLS
 
     # 只提取 df 中确实存在的列（过滤掉不存在的列）
     existing_cols = [col for col in target_cols if col in df.columns]
