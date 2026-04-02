@@ -18,46 +18,36 @@ class TJEPA_KAN_PIDL(nn.Module):
             try:
                 # 读取权重文件
                 checkpoint = torch.load(pretrained_path)
-                # 处理可能存在的 'state_dict' 嵌套
                 state_dict = checkpoint['state_dict'] if 'state_dict' in checkpoint else checkpoint
 
-                # 获取当前模型的字典
-                model_dict = self.tjepa.state_dict()
+                # 【修正 1】严格检查 Embedding 层维度
+                # 如果预训练是 50 维，这里是 9 维，必须报错，不能静默跳过
+                current_emb_shape = self.tjepa.feature_embeds[0].weight.shape
+                pretrained_emb_shape = state_dict['feature_embeds.0.weight'].shape
 
-                # 【核心逻辑】筛选权重
-                # 只有当 key 存在且 shape 完全一致时才加载
-                # 这样可以自动过滤掉维度不匹配的 embedding 层，保留 Transformer 核心层
-                pretrained_dict = {
-                    k: v for k, v in state_dict.items()
-                    if k in model_dict and v.shape == model_dict[k].shape
-                }
+                if current_emb_shape != pretrained_emb_shape:
+                    raise ValueError(
+                        f"❌ 特征维度不匹配！预训练模型: {pretrained_emb_shape}, 当前模型: {current_emb_shape}")
 
-                # 更新权重
-                model_dict.update(pretrained_dict)
-                self.tjepa.load_state_dict(model_dict)
-
-                # 打印加载情况
-                loaded_keys = len(pretrained_dict)
-                total_keys = len(state_dict)
-                print(f" 成功加载预训练权重: {loaded_keys}/{total_keys} 层匹配成功。")
-                print("   (Embedding层因维度不同被跳过是正常的，Transformer核心层已加载)")
+                # 加载权重 (strict=False 是因为我们需要忽略 target_encoder 和 predictor)
+                self.tjepa.load_state_dict(state_dict, strict=False)
+                print(f"✅ 成功加载预训练权重: {pretrained_path}")
 
             except FileNotFoundError:
-                print(" 未找到预训练权重文件，将使用随机初始化！")
+                print(f"⚠️ 未找到权重文件: {pretrained_path}，使用随机初始化！")
             except Exception as e:
-                print(f" 加载权重时出错: {e}，将使用随机初始化！")
+                print(f"⚠️ 加载权重时出错: {e}")
+                raise e  # 建议抛出异常，不要继续训练，否则是随机初始化
 
         # 3. 冻结 T-JEPA (Context Encoder) 的参数
-        # 建议：如果只是做迁移学习，先冻结比较好
         for param in self.tjepa.parameters():
-            param.requires_grad = False
+            param.requires_grad = True
 
         # 4. KAN 网络
         self.norm = nn.LayerNorm(128)
         # 输入维度是 T-JEPA 的 embed_dim (128)
-        # 这里的 layers 设置为 [128, 32, 2]
         self.kan = KAN(
-            layers_hidden=[128, 32, 2],
+            layers_hidden=[137, 32, 2],
             grid_size=10,
             spline_order=3
         )
@@ -71,25 +61,51 @@ class TJEPA_KAN_PIDL(nn.Module):
         self.register_buffer('area_up', torch.tensor(3 * 3.14159 * (0.1) ** 2))
         self.register_buffer('area_low', torch.tensor(4 * 3.14159 * (0.1) ** 2))
 
-    def forward(self, x):
-        # 1. 提取特征
-        b, n = x.shape
-        # 下游任务使用全量的 x，不进行 Mask (全为 True)
-        full_mask = torch.ones(b, n, dtype=torch.bool, device=x.device)
+    # def forward(self, x):
+    #     # 1. 提取特征
+    #     b, n = x.shape
+    #     # 下游任务使用全量的 x，不进行 Mask (全为 True)
+    #     full_mask = torch.ones(b, n, dtype=torch.bool, device=x.device)
+    #
+    #     # 使用 Context Encoder 提取特征
+    #     # forward_context 返回 (B, N+1, E), 其中 N=9, +1是REG
+    #     h_rep = self.tjepa.forward_context(x, full_mask)
+    #
+    #     # 2. 特征聚合 【核心修正】
+    #     # ❌ 原代码：reg_feat = h_rep[:, -1, :] (使用了论文明确说要丢弃的 REG)
+    #     # ✅ 新代码：切除 REG，对特征 Token 进行 Mean Pooling
+    #
+    #     feature_tokens = h_rep[:, :-1, :]  # (B, 9, 128) 丢弃最后一位
+    #     global_feat = feature_tokens.mean(dim=1)  # (B, 128) 全局平均池化
+    #
+    #     # 3. 归一化适配 KAN 【核心修正】
+    #     # LayerNorm 输出范围不固定，KAN 需要 [-1, 1]
+    #     x_kan = self.norm(global_feat)
+    #     x_kan = torch.tanh(x_kan)  # 强行压缩到 [-1, 1] 区间
+    #
+    #     # 4. 喂给 KAN
+    #     y_pred = self.kan(x_kan)
+    #
+    #     return y_pred
 
-        # 使用 Context Encoder 提取特征
-        # forward_context 返回 (B, N+1, E)
+    def forward(self, x):
+        # 1. T-JEPA 提取高级特征
+        b, n = x.shape
+        full_mask = torch.ones(b, n, dtype=torch.bool, device=x.device)
         h_rep = self.tjepa.forward_context(x, full_mask)
 
-        # 2. 特征聚合
-        # 取出 [REG] Token 作为全局特征 (它是序列的最后一个)
-        reg_feat = h_rep[:, -1, :]  # (B, 128)
+        feature_tokens = h_rep[:, :-1, :]
+        global_feat = feature_tokens.mean(dim=1)  # (B, 128)
 
-        reg_feat = self.norm(reg_feat)
+        # 2. 归一化
+        deep_feat = torch.tanh(self.norm(global_feat))
 
-        # 3. 喂给 KAN
-        y_pred = self.kan(reg_feat)
+        # 3. 【核心改进】将预训练特征与原始 9 维输入拼接
+        # 这样 KAN 既有全局感官，又有原始精确数值
+        combined_feat = torch.cat([deep_feat, x], dim=1)  # (B, 128 + 9 = 137维)
 
+        # 4. 更新 KAN 的输入维度 (在 __init__ 里把 KAN 的输入从 128 改为 137)
+        y_pred = self.kan(combined_feat)
         return y_pred
 
     def get_real_physics_params(self):
@@ -100,6 +116,8 @@ class TJEPA_KAN_PIDL(nn.Module):
     def get_net_parameters(self):
         # 返回 KAN 的参数 (T-JEPA已冻结)
         return self.kan.parameters()
+
+
 
     def get_phy_parameters(self):
         return [self.B_coeff, self.K_coeff]
